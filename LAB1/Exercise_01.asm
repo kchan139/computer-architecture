@@ -1,14 +1,17 @@
 .data
-prompt1: .asciiz  "Enter the first number: "
-prompt2: .asciiz  "Enter the second number: "
-prompt3: .asciiz  "Choose an operation ('1' for addition, '2' for subtraction, '3' for multiplication, '4' for division): "
-result: .asciiz   "Result: "
-errormsg: .asciiz "Divide-by-0 ERROR"
+string_prompt1: .asciiz  "Enter the first number: "
+string_prompt2: .asciiz  "Enter the second number: "
+
+string_prompt3: .asciiz  "Choose an operation ('1' for addition, '2' for subtraction, '3' for multiplication, '4' for division): "
+string_result: .asciiz   "Result: "
+
+string_errormsg: .asciiz "Divide-by-0 ERROR"
+
 
 .text
 main:
     ori $v0, $zero, 4
-    la $a0, prompt1
+    la $a0, string_prompt1
     syscall
 
     ori $v0, $zero, 5
@@ -16,7 +19,7 @@ main:
     add $t0, $zero, $v0
 
     ori $v0, $zero, 4
-    la $a0, prompt2
+    la $a0, string_prompt2
     syscall
 
     ori $v0, $zero, 5
@@ -24,7 +27,7 @@ main:
     add $t1, $zero, $v0
 
     ori $v0, $zero, 4
-    la $a0, prompt3
+    la $a0, string_prompt3
     syscall
 
     ori $v0, $zero, 5
@@ -55,7 +58,7 @@ division:
 
 print_result:
 	ori	$v0, $zero, 4 
-	la	$a0, result
+	la	$a0, string_result
 	syscall 
 
 	add	$a0, $zero, $t2 
@@ -66,7 +69,7 @@ print_result:
 	
 exception:
 	ori $v0, $zero, 4
-    	la $a0, errormsg
+    	la $a0, string_errormsg
     	syscall
 
 exit:

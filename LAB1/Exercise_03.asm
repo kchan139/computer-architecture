@@ -2,16 +2,16 @@
 array: .word 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15
 size: .word 15
 
-string_mode_in: .asciiz "Please choose string_mode_in 1 (Print value) or 2 (Print sequence): "
-string_value_in: .asciiz "Please choose an index [0, 14]: "
+string_mode_in: .asciiz "\nPlease choose string_mode_in 1 (Print value) or 2 (Print sequence): "
+string_value_in: .asciiz "\nPlease choose an index [0, 14]: "
 
-strseq_in_1: .asciiz "Please choose the 1st index [0, 14]: "
-strseq_in_2: .asciiz "Please choose the 2nd index [0, 14] and >= the 1st index: "
+strseq_in_1: .asciiz "\nPlease choose the 1st index [0, 14]: "
+strseq_in_2: .asciiz "\nPlease choose the 2nd index [0, 14] and >= the 1st index: "
 
-result: .asciiz "The result is: "
+result: .asciiz "\nThe result is: "
 
-out_of_bound: .asciiz "Index out of range!"
-invalid_seq: .asciiz "The 2nc index must be >= to the first index!"
+out_of_bound: .asciiz "\nIndex out of range!"
+invalid_seq: .asciiz "\nThe 2nc index must be >= to the first index!"
 
 
 .text

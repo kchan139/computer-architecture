@@ -1,6 +1,6 @@
 .data
 getinput:  .asciiz "Input a number: "
-result: .asciiz "The result is: "
+result: .asciiz "Factorial: "
 
 
 .text

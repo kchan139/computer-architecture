@@ -69,8 +69,8 @@ print_result:
 	
 exception:
 	ori $v0, $zero, 4
-    	la $a0, string_errormsg
-    	syscall
+    la $a0, string_errormsg
+    syscall
 
 exit:
    ori   $v0, $zero, 10

@@ -21,8 +21,10 @@ main:
 	li $v0 4
 	la $a0 string_mode_in
 	syscall
+
 	li $v0 5
 	syscall
+
 	add $s2 $0 $v0
 	beq $s2 1 value
 	beq $s2 2 sequence
@@ -31,8 +33,10 @@ value:
 	li $v0 4
 	la $a0 string_value_in
 	syscall
+
 	li $v0 5
 	syscall
+
 	add $s3 $0 $v0
 	addi $t1 $0 4
 	mul $t0 $s3 $t1
@@ -40,6 +44,7 @@ value:
 	li $v0 4
 	la $a0 result
 	syscall
+	
 	lw $a0 ($t1)
 	li $v0 1
 	syscall

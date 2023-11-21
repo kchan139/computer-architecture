@@ -1,0 +1,101 @@
+.data
+.eqv SYS_PRINT_INT 1
+.eqv SYS_PRINT_STRING 4
+.eqv SYS_READ_INT 5
+.eqv SYS_READ_STRING 8
+.eqv SYS_EXIT 10
+
+title_1:  .asciiz " ______        _     _________  _________  _____     ________   ______   ____  ____  _____  _______   \n"
+title_2:  .asciiz "|_   _  \\     / \\   |  _   _  ||  _   _  ||_   _|   |_   __  |.' ____ \\ |_   ||   _||_   _||_   __  \\  \n"
+title_3:  .asciiz "  | |_) |    / _ \\  |_/ | | \\_||_/ | | \\_|  | |       | |_ \\_|| (___ \\_|  | |__| |    | |    | |__) | \n"
+title_4:  .asciiz "  |  __'.   / ___ \\     | |        | |      | |   _   |  _| _  _.____`.   |  __  |    | |    |  ___/  \n"
+title_5:  .asciiz " _| |__) |_/ /   \\ \\_  _| |_      _| |_    _| |__/ | _| |__/ || \\____) | _| |  | |_  _| |_  _| |_     \n"
+title_6:  .asciiz "|_______/|____| |____||_____|    |_____|  |________||________| \\______.'|____||____||_____||_____|    \n"
+title_7:  .asciiz "                                                                                                         \n"
+title_8:  .asciiz "                                                                                               __/___\n"
+title_9:  .asciiz "                                                                                         _____/______|\n"
+title_10: .asciiz "                                                                                 _______/_____\\_______\\_____\n"
+title_11: .asciiz "                                                                                 \\              < < <       |\n"
+title_12: .asciiz "                                                                               ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n"
+
+
+grid_size:   .word 7
+player1_map: .space 49
+player2_map: .space 49
+
+space:       .asciiz " "
+newline:     .asciiz "\n"
+comma:       .asciiz ","
+
+prompt_ship: .asciiz "Enter ship location (r c r c): "
+prompt_shot: .asciiz "Enter shot location (r c): "
+
+invalid_format:   .asciiz "Invalid format. Try again.\n"
+invalid_location: .asciiz "Invalid location. Try again.\n"
+invalid_shot:     .asciiz "Invalid shot. Try again.\n"
+
+hit:         .asciiz " O.O HIT! O.O \n"
+
+.text
+main:
+    jal print_title
+
+    exit:
+        li $v0 SYS_EXIT
+        syscall
+
+print_title:
+    # region[rgba(0, 255, 0, 0.1)]
+    la $a0 title_1
+    li $v0 SYS_PRINT_STRING
+    syscall
+    la $a0 title_2
+    li $v0 SYS_PRINT_STRING
+    syscall
+    la $a0 title_3
+    li $v0 SYS_PRINT_STRING
+    syscall
+    la $a0 title_4
+    li $v0 SYS_PRINT_STRING
+    syscall
+    la $a0 title_5
+    li $v0 SYS_PRINT_STRING
+    syscall
+    la $a0 title_6
+    li $v0 SYS_PRINT_STRING
+    syscall
+    la $a0 title_7
+    li $v0 SYS_PRINT_STRING
+    syscall
+    la $a0 title_8
+    li $v0 SYS_PRINT_STRING
+    syscall
+    la $a0 title_9
+    li $v0 SYS_PRINT_STRING
+    syscall
+    la $a0 title_10
+    li $v0 SYS_PRINT_STRING
+    syscall
+    la $a0 title_11
+    li $v0 SYS_PRINT_STRING
+    syscall
+    la $a0 title_12
+    li $v0 SYS_PRINT_STRING
+    syscall
+
+    jr $ra
+    # endregion
+
+read_int:
+    li $v0 SYS_READ_INT
+    syscall
+    jr $ra
+
+read_ship:
+    li $v0 SYS_PRINT_STRING
+    la $a0 prompt_ship
+    syscall
+
+    # TO DO
+
+    jr $ra

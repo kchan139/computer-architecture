@@ -1,10 +1,16 @@
 .data
-.eqv SYS_PRINT_INT 1
+.eqv SYS_PRINT_INT    1
 .eqv SYS_PRINT_STRING 4
-.eqv SYS_READ_INT 5
-.eqv SYS_READ_STRING 8
-.eqv SYS_EXIT 10
+.eqv SYS_READ_INT     5
+.eqv SYS_READ_STRING  8
+.eqv SYS_EXIT         10
+.eqv SYS_PRINT_CHAR   11
+.eqv SYS_READ_CHAR    12
 
+.eqv char_y 121
+.eqv char_Y 89
+
+title_0:  .asciiz "======================================================================================================\n"
 title_1:  .asciiz " ______        _     _________  _________  _____     ________   ______   ____  ____  _____  _______   \n"
 title_2:  .asciiz "|_   _  \\     / \\   |  _   _  ||  _   _  ||_   _|   |_   __  |.' ____ \\ |_   ||   _||_   _||_   __  \\  \n"
 title_3:  .asciiz "  | |_) |    / _ \\  |_/ | | \\_||_/ | | \\_|  | |       | |_ \\_|| (___ \\_|  | |__| |    | |    | |__) | \n"
@@ -18,16 +24,56 @@ title_10: .asciiz "                                                             
 title_11: .asciiz "                                                                                 \\              < < <       |\n"
 title_12: .asciiz "                                                                               ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n"
 
+rule_0:     .asciiz "\n"
+rule_1:     .asciiz "                                  ___  __  ____   ________\n"
+rule_2:     .asciiz "                                 / _ \\/ / / / /  / __/ __/\n"
+rule_3:     .asciiz "                                / , _/ /_/ / /__/ _/_\\ \\  \n"
+rule_4:     .asciiz "                               /_/|_|\\____/____/___/___/  \n"
+rule_5:     .asciiz "                                                          \n"
+rule_6:     .asciiz " Setup Phase:\n"
+rule_7:     .asciiz "    Players take turns placing their ships on a 7x7 grid. Placing format: (r_bow  c_bow  r_stern  c_stern)\n"
+rule_8:     .asciiz "    Each player has:\n"
+rule_9:     .asciiz "        3 ships of size 2x1\n"
+rule_10:    .asciiz "        2 ships of size 3x1\n"
+rule_11:    .asciiz "        1 ship of size 4x1\n"
+rule_12:    .asciiz "    Ships cannot overlap.\n"
+rule_13:    .asciiz "    Ships cannot be placed diagonally.\n\n"
 
-grid_size:   .word 7
-player1_map: .space 49
-player2_map: .space 49
+rule_14:    .asciiz "Gameplay:\n"
+rule_15:    .asciiz "    Players alternate turns.\n"
+rule_16:    .asciiz "    On their turn, a player inputs coordinates (r  c) to target an opponent's cell.\n"
+rule_17:    .asciiz "    Hit Announcement:\n"
+rule_18:    .asciiz "        If a targeted cell is part of an opponent's ship, an announcement appears: HIT!\n\n"
 
-space:       .asciiz " "
-newline:     .asciiz "\n"
-comma:       .asciiz ","
+rule_19:    .asciiz "Update Board:\n"
+rule_20:    .asciiz "    A hit cell's value changes to 0, indicating damage.\n"
+rule_21:    .asciiz "    A ship is destroyed when all its cells are hit.\n\n"
 
-prompt_ship: .asciiz "Enter ship location (r c r c): "
+rule_22:    .asciiz "Winning:\n"
+rule_23:    .asciiz "    The game ends when a player's board has no remaining ships.\n"
+rule_24:    .asciiz "    The first player to lose all their ships is the loser.\n"
+
+proceed:  .asciiz "\n   PROCEED ? [Y/N]: "
+start:    .asciiz "\n   START ? [Y/N]: "
+
+grid_size:    .word 7
+player_a_map: .byte 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+player_b_map: .byte 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+
+player_label:  .asciiz "               Player A                             Player B           \n"
+grid_bar:      .asciiz "    o---o---o---o---o---o---o---o        o---o---o---o---o---o---o---o \n"
+grid_label:    .asciiz "    | A | 1 | 2 | 3 | 4 | 5 | 6 |        | B | 1 | 2 | 3 | 4 | 5 | 6 | \n"
+grid_helper:   .asciiz "    | "
+grid_vert:     .asciiz " | "
+grid_trans:    .asciiz "      "
+
+
+
+space: .asciiz " "
+endl:  .asciiz "\n"
+comma: .asciiz ","
+
+prompt_ship: .asciiz "Enter ship location (r_bow  c_bow  r_stern  c_stern): "
 prompt_shot: .asciiz "Enter shot location (r c): "
 
 invalid_format:   .asciiz "Invalid format. Try again.\n"
@@ -38,14 +84,19 @@ hit:         .asciiz " O.O HIT! O.O \n"
 
 .text
 main:
-    jal print_title
+    jal game_menu
+    jal rules_screen
+    jal read_ship
 
-    exit:
-        li $v0 SYS_EXIT
-        syscall
+exit:
+    li $v0 SYS_EXIT
+    syscall
 
-print_title:
+game_menu:
     # region[rgba(0, 255, 0, 0.1)]
+    la $a0 title_0
+    li $v0 SYS_PRINT_STRING
+    syscall
     la $a0 title_1
     li $v0 SYS_PRINT_STRING
     syscall
@@ -67,6 +118,9 @@ print_title:
     la $a0 title_7
     li $v0 SYS_PRINT_STRING
     syscall
+    la $a0 title_0
+    li $v0 SYS_PRINT_STRING
+    syscall
     la $a0 title_8
     li $v0 SYS_PRINT_STRING
     syscall
@@ -83,19 +137,210 @@ print_title:
     li $v0 SYS_PRINT_STRING
     syscall
 
-    jr $ra
+    la $a0 start
+    li $v0 SYS_PRINT_STRING
+    syscall
+    li $v0 SYS_READ_CHAR
+    syscall
+
+    move $t0 $v0
+    # read '\n' character
+    li $v0 SYS_READ_CHAR
+    syscall
+
+    la $a0 endl
+    li $v0 SYS_PRINT_STRING
+    syscall
+    la $a0 endl
+    li $v0 SYS_PRINT_STRING
+    syscall
+
+    li $t1 char_y
+    beq $t0 $t1 game_menu_proceed
+    li $t1 char_Y
+    beq $t0 $t1 game_menu_proceed
+    j exit
+
+    game_menu_proceed:
+        jr $ra
     # endregion
 
-read_int:
-    li $v0 SYS_READ_INT
+rules_screen:
+    # region[rgba(0, 0, 255, 0.1)]
+    la $a0 rule_0
+    li $v0 SYS_PRINT_STRING
     syscall
-    jr $ra
+    la $a0 rule_1
+    li $v0 SYS_PRINT_STRING
+    syscall
+    la $a0 rule_2
+    li $v0 SYS_PRINT_STRING
+    syscall
+    la $a0 rule_3
+    li $v0 SYS_PRINT_STRING
+    syscall
+    la $a0 rule_4
+    li $v0 SYS_PRINT_STRING
+    syscall
+    la $a0 rule_5
+    li $v0 SYS_PRINT_STRING
+    syscall
+    la $a0 rule_6
+    li $v0 SYS_PRINT_STRING
+    syscall
+    la $a0 rule_7
+    li $v0 SYS_PRINT_STRING
+    syscall
+    la $a0 rule_8
+    li $v0 SYS_PRINT_STRING
+    syscall
+    la $a0 rule_9
+    li $v0 SYS_PRINT_STRING
+    syscall
+    la $a0 rule_10
+    li $v0 SYS_PRINT_STRING
+    syscall
+    la $a0 rule_11
+    li $v0 SYS_PRINT_STRING
+    syscall
+    la $a0 rule_12
+    li $v0 SYS_PRINT_STRING
+    syscall
+    la $a0 rule_13
+    li $v0 SYS_PRINT_STRING
+    syscall
+    la $a0 rule_14
+    li $v0 SYS_PRINT_STRING
+    syscall
+    la $a0 rule_15
+    li $v0 SYS_PRINT_STRING
+    syscall
+    la $a0 rule_16
+    li $v0 SYS_PRINT_STRING
+    syscall
+    la $a0 rule_17
+    li $v0 SYS_PRINT_STRING
+    syscall
+    la $a0 rule_18
+    li $v0 SYS_PRINT_STRING
+    syscall
+    la $a0 rule_19
+    li $v0 SYS_PRINT_STRING
+    syscall
+    la $a0 rule_20
+    li $v0 SYS_PRINT_STRING
+    syscall
+    la $a0 rule_21
+    li $v0 SYS_PRINT_STRING
+    syscall
+    la $a0 rule_22
+    li $v0 SYS_PRINT_STRING
+    syscall
+    la $a0 rule_23
+    li $v0 SYS_PRINT_STRING
+    syscall
+    la $a0 rule_24
+    li $v0 SYS_PRINT_STRING
+    syscall
+
+    la $a0 proceed
+    li $v0 SYS_PRINT_STRING
+    syscall
+    li $v0 SYS_READ_CHAR
+    syscall
+
+    move $t0 $v0
+    # read '\n' character
+    li $v0 SYS_READ_CHAR
+    syscall
+
+    la $a0 endl
+    li $v0 SYS_PRINT_STRING
+    syscall
+    la $a0 endl
+    li $v0 SYS_PRINT_STRING
+    syscall
+
+    li $t1 char_y
+    beq $t0 $t1 rules_screen_proceed
+    li $t1 char_Y
+    beq $t0 $t1 rules_screen_proceed
+    j main
+    
+    rules_screen_proceed:
+        jr $ra
+    # endregion
 
 read_ship:
+    # region[rgba(255, 0, 0, 0.1)]
+    la $a0 player_label
     li $v0 SYS_PRINT_STRING
+    syscall
+    la $a0 grid_bar
+    li $v0 SYS_PRINT_STRING
+    syscall
+
+    print_map_loop:
+        # Print map elements
+        # TO DO
+        li $t0 1
+        li $t1 0
+        lw $s0 grid_size
+        la $a0 grid_label
+        li $v0 SYS_PRINT_STRING
+        syscall
+        la $a0 grid_bar
+        li $v0 SYS_PRINT_STRING
+        syscall
+
+        print_map_rows:
+            la $a0 grid_helper
+            li $v0 SYS_PRINT_STRING
+            syscall
+            move $a0 $t0
+            li $v0 SYS_PRINT_INT
+            syscall
+
+            # Print map elements in a row
+            li $t1 0
+            print_map_elements:
+                # Print map element
+                la $a0 grid_vert
+                li $v0 SYS_PRINT_STRING
+                syscall
+
+                lb $a0 player_a_map($t1)
+                li $v0 SYS_PRINT_INT
+                syscall
+
+                # Increment counter
+                addi $t1, $t1, 1
+                beq $t1, $s0, print_map_elements_exit
+
+                j print_map_elements
+
+            print_map_elements_exit:
+
+            # Move to the next row
+            la $a0 grid_bar
+            li $v0 SYS_PRINT_STRING
+            syscall
+            la $a0 endl
+            li $v0 SYS_PRINT_STRING
+            syscall
+
+            # Increment row counter
+            addi $t0, $t0, 1
+
+            # Check if all rows have been printed
+            bne $t0, $s0, print_map_rows
+
+            jr $ra
     la $a0 prompt_ship
+    li $v0 SYS_PRINT_STRING
     syscall
 
     # TO DO
 
     jr $ra
+    # endregion

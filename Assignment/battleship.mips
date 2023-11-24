@@ -7,30 +7,65 @@
 .eqv SYS_PRINT_CHAR   11
 .eqv SYS_READ_CHAR    12
 
-.eqv char_y 121
-.eqv char_Y 89
+.eqv char_0     48
+.eqv char_1     49
+.eqv char_2     50
+.eqv char_3     51
+.eqv char_4     52
+.eqv char_5     53
+.eqv char_6     54
+.eqv char_N     78
+.eqv char_Q     81
+.eqv char_R     82
+.eqv char_Y     89
+.eqv char_n     110
+.eqv char_q     113
+.eqv char_r     114
+.eqv char_y     121
+.eqv char_space 32
 
-title_0:  .asciiz "======================================================================================================\n"
-title_1:  .asciiz " ______        _     _________  _________  _____     ________   ______   ____  ____  _____  _______   \n"
-title_2:  .asciiz "|_   _  \\     / \\   |  _   _  ||  _   _  ||_   _|   |_   __  |.' ____ \\ |_   ||   _||_   _||_   __  \\  \n"
-title_3:  .asciiz "  | |_) |    / _ \\  |_/ | | \\_||_/ | | \\_|  | |       | |_ \\_|| (___ \\_|  | |__| |    | |    | |__) | \n"
-title_4:  .asciiz "  |  __'.   / ___ \\     | |        | |      | |   _   |  _| _  _.____`.   |  __  |    | |    |  ___/  \n"
-title_5:  .asciiz " _| |__) |_/ /   \\ \\_  _| |_      _| |_    _| |__/ | _| |__/ || \\____) | _| |  | |_  _| |_  _| |_     \n"
-title_6:  .asciiz "|_______/|____| |____||_____|    |_____|  |________||________| \\______.'|____||____||_____||_____|    \n"
-title_7:  .asciiz "                                                                                                         \n"
+.eqv number_of_ships 6
+.eqv input_coordinates_length 9
+
+player_a_map:     .byte 0, 0, 0, 0, 0, 0, 0,
+                        0, 0, 0, 0, 0, 0, 0,
+                        0, 0, 0, 0, 0, 0, 0,
+                        0, 0, 0, 0, 0, 0, 0,
+                        0, 0, 0, 0, 0, 0, 0,
+                        0, 0, 0, 0, 0, 0, 0,
+                        0, 0, 0, 0, 0, 0, 0
+
+player_b_map:     .byte 0, 0, 0, 0, 0, 0, 0,
+                        0, 0, 0, 0, 0, 0, 0,
+                        0, 0, 0, 0, 0, 0, 0,
+                        0, 0, 0, 0, 0, 0, 0,
+                        0, 0, 0, 0, 0, 0, 0,
+                        0, 0, 0, 0, 0, 0, 0,
+                        0, 0, 0, 0, 0, 0, 0
+grid_size:        .word  7
+ship_coordinates: .space 8
+
+title_0:  .asciiz "===============================================================================================================\n"
+title_1:  .asciiz "||    ______        _     _________  _________  _____     ________   ______   ____  ____  _____  _______     ||\n"
+title_2:  .asciiz "||   |_   _  \\     / \\   |  _   _  ||  _   _  ||_   _|   |_   __  | / ____ \\ |_   ||   _||_   _||_   __  \\   ||\n"
+title_3:  .asciiz "||     | |_) |    / _ \\  |_/ | | \\_||_/ | | \\_|  | |       | |_ \\_|| (___ \\_|  | |__| |    | |    | |__) |   ||\n"
+title_4:  .asciiz "||     |  __ \\   / ___ \\     | |        | |      | |   _   |  _| _  _.____`.   |  __  |    | |    |  ___/    ||\n"
+title_5:  .asciiz "||    _| |__) |_/ /   \\ \\_  _| |_      _| |_    _| |__/ | _| |__/ || \\____) | _| |  | |_  _| |_  _| |_       ||\n"
+title_6:  .asciiz "||   |_______/|____| |____||_____|    |_____|  |________||________| \\______/ |____||____||_____||_____|      ||\n"
+title_7:  .asciiz "||                                                                                                           ||\n"
 title_8:  .asciiz "                                                                                               __/___\n"
 title_9:  .asciiz "                                                                                         _____/______|\n"
 title_10: .asciiz "                                                                                 _______/_____\\_______\\_____\n"
 title_11: .asciiz "                                                                                 \\              < < <       |\n"
 title_12: .asciiz "                                                                               ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n"
 
-rule_0:     .asciiz "\n"
-rule_1:     .asciiz "                                  ___  __  ____   ________\n"
-rule_2:     .asciiz "                                 / _ \\/ / / / /  / __/ __/\n"
-rule_3:     .asciiz "                                / , _/ /_/ / /__/ _/_\\ \\  \n"
-rule_4:     .asciiz "                               /_/|_|\\____/____/___/___/  \n"
-rule_5:     .asciiz "                                                          \n"
-rule_6:     .asciiz "Setup Phase:\n"
+rule_0:     .asciiz "   ________________________________\n"
+rule_1:     .asciiz "   |    ___  __  ____   ________  |\n"
+rule_2:     .asciiz "   |   / _ \\/ / / / /  / __/ __/  |\n"
+rule_3:     .asciiz "   |  / , _/ /_/ / /__/ _/_\\ \\    |\n"
+rule_4:     .asciiz "   | /_/|_|\\____/____/___/___/    |\n"
+rule_5:     .asciiz "   |______________________________|\n"
+rule_6:     .asciiz "\nSetup Phase:\n"
 rule_7:     .asciiz "    Players take turns placing their ships on a 7x7 grid. Placing format: (r_bow  c_bow  r_stern  c_stern)\n"
 rule_8:     .asciiz "    Each player has:\n"
 rule_9:     .asciiz "        3 ships of size 2x1\n"
@@ -56,10 +91,6 @@ rule_24:    .asciiz "    The first player to lose all their ships is the loser.\
 proceed:  .asciiz "\n   PROCEED ? [Y/N]: "
 start:    .asciiz "\n   START ? [Y/N]: "
 
-grid_size:    .word 7
-player_a_map: .byte 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
-player_b_map: .byte 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
-
 char_A:        .asciiz "A"
 char_B:        .asciiz "B"
 player_label:  .asciiz "    |         Player A          |        |          Player B         | \n"
@@ -69,30 +100,41 @@ grid_helper:   .asciiz "    | "
 grid_vert:     .asciiz        " | "
 grid_trans:    .asciiz                                   "       | "
 
-
-
 space: .asciiz " "
 endl:  .asciiz "\n"
 comma: .asciiz ","
 
-prompt_ship: .asciiz "Enter ship location (r_bow  c_bow  r_stern  c_stern): "
+player_a_place_turn: .asciiz "\n!!! PLAYER A TURN !!!\n"
+player_b_place_turn: .asciiz "\n!!! PLAYER B TURN !!!\n"
+
+prompt_ship: .asciiz "\n! ENTER SHIPS LOCATIONS !~\nInput format: [r_bow  c_bow  r_stern  c_stern]\n[Q]: Quit to main menu\n[R]: Restart\n"
 prompt_shot: .asciiz "Enter shot location (r c): "
 
-invalid_format:   .asciiz "Invalid format. Try again.\n"
-invalid_location: .asciiz "Invalid location. Try again.\n"
-invalid_shot:     .asciiz "Invalid shot. Try again.\n"
+invalid_format:    .asciiz "\nInvalid coordinates format. Try again.\n"
+invalid_size:      .asciiz "\nInvalid ship size. Try again.\n"
+invalid_location:  .asciiz "\nShips cannot overlap. Try again.\n"
+invalid_placement: .asciiz "\nShips cannot be placed diagonally. Try again.\n"
+invalid_shot:      .asciiz "\nInvalid shot. Try again.\n"
+
+confirmed_ship:    .asciiz "Ship position confirmed.\n"
 
 hit:         .asciiz " O.O HIT! O.O \n"
 
 .text
 main:
     lw $s0 grid_size
-    la $s1 player_a_map
-    la $s2 player_b_map
+    li $s1 1
+    li $s2 2
+    li $s3 3
+    la $s4 player_a_map
+    la $s5 player_b_map
 
     jal game_menu
     jal rules_screen
     jal print_maps
+    la $a0 player_a_place_turn
+    li $v0 SYS_PRINT_STRING
+    syscall
     jal read_ship
 
 exit:
@@ -144,29 +186,31 @@ game_menu:
     li $v0 SYS_PRINT_STRING
     syscall
 
-    la $a0 start
-    li $v0 SYS_PRINT_STRING
-    syscall
-    li $v0 SYS_READ_CHAR
-    syscall
+    start_loop:
+        la $a0 start
+        li $v0 SYS_PRINT_STRING
+        syscall
+        li $v0 SYS_READ_CHAR
+        syscall
 
-    move $t0 $v0
-    # read '\n' character
-    li $v0 SYS_READ_CHAR
-    syscall
+        move $t0 $v0
+        # read '\n' character
+        li $v0 SYS_READ_CHAR
+        syscall
 
-    la $a0 endl
-    li $v0 SYS_PRINT_STRING
-    syscall
-    la $a0 endl
-    li $v0 SYS_PRINT_STRING
-    syscall
+        la $a0 endl
+        li $v0 SYS_PRINT_STRING
+        syscall
+        la $a0 endl
+        li $v0 SYS_PRINT_STRING
+        syscall
 
-    li $t1 char_y
-    beq $t0 $t1 game_menu_proceed
-    li $t1 char_Y
-    beq $t0 $t1 game_menu_proceed
-    j exit
+        beq $t0 char_y game_menu_proceed
+        beq $t0 char_Y game_menu_proceed
+        beq $t0 char_n exit
+        beq $t0 char_N exit
+        
+        j start_loop
 
     game_menu_proceed:
         jr $ra
@@ -250,41 +294,156 @@ rules_screen:
     li $v0 SYS_PRINT_STRING
     syscall
 
-    la $a0 proceed
-    li $v0 SYS_PRINT_STRING
-    syscall
-    li $v0 SYS_READ_CHAR
-    syscall
+    proceed_loop:
+        la $a0 proceed
+        li $v0 SYS_PRINT_STRING
+        syscall
+        li $v0 SYS_READ_CHAR
+        syscall
 
-    move $t0 $v0
-    # read '\n' character
-    li $v0 SYS_READ_CHAR
-    syscall
+        move $t0 $v0
+        # read '\n' character
+        li $v0 SYS_READ_CHAR
+        syscall
 
-    la $a0 endl
-    li $v0 SYS_PRINT_STRING
-    syscall
-    la $a0 endl
-    li $v0 SYS_PRINT_STRING
-    syscall
+        la $a0 endl
+        li $v0 SYS_PRINT_STRING
+        syscall
+        la $a0 endl
+        li $v0 SYS_PRINT_STRING
+        syscall
 
-    li $t1 char_y
-    beq $t0 $t1 rules_screen_proceed
-    li $t1 char_Y
-    beq $t0 $t1 rules_screen_proceed
-    j main
+        beq $t0 char_y rules_screen_proceed
+        beq $t0 char_Y rules_screen_proceed
+        beq $t0 char_n main
+        beq $t0 char_N main
+        j proceed_loop
     
     rules_screen_proceed:
         jr $ra
     # endregion
 
 read_ship:
-    # region[rgba(255, 0, 0, 0.1)]
+    # region[rgba(255, 0, 0, 0.2)]
     la $a0 prompt_ship
     li $v0 SYS_PRINT_STRING
     syscall
 
-    # TO DO
+    li $t0 number_of_ships
+    read_ship_loop:
+        beq $t0 $zero read_ship_loop_end
+
+        la $a0 ship_coordinates
+        li $a1 input_coordinates_length
+        li $v0 SYS_READ_STRING
+        syscall
+
+        #===== VALIDATING INPUT =====#
+        user_option_checking:
+            lb $t1 ship_coordinates
+            beq $t1 char_R read_ship
+            beq $t1 char_r read_ship
+            beq $t1 char_Q main
+            beq $t1 char_q main
+
+        format_checking:
+            li $t1 1
+            lb $t2 ship_coordinates($t1)
+            bne $t2 char_space invalid_syntax
+            li $t1 3
+            lb $t2 ship_coordinates($t1)
+            bne $t2 char_space invalid_syntax
+            li $t1 5
+            lb $t2 ship_coordinates($t1)
+            bne $t2 char_space invalid_syntax
+
+        value_checking:
+            li $t1 0
+            lb $t2 ship_coordinates($t1)
+            blt $t2 char_0 invalid_syntax
+            bgt $t2 char_6 invalid_syntax
+            li $t1 2
+            lb $t3 ship_coordinates($t1)
+            blt $t3 char_0 invalid_syntax
+            bgt $t3 char_6 invalid_syntax
+            li $t1 4
+            lb $t4 ship_coordinates($t1)
+            blt $t4 char_0 invalid_syntax
+            bgt $t4 char_6 invalid_syntax
+            li $t1 6
+            lb $t5 ship_coordinates($t1)
+            blt $t5 char_0 invalid_syntax
+            bgt $t5 char_6 invalid_syntax
+
+        diagonal_checking:
+            beq $t2 $t4 horizontal_size_checking
+            beq $t3 $t5 vertical_size_checking
+            j diagonally_placed
+
+        horizontal_size_checking:   
+            sub $s6 $t5 $t3
+            abs $s6 $s6
+            blt $s6 1 invalid_ship_size
+            bgt $s6 3 invalid_ship_size
+
+            j overlap_checking
+
+        vertical_size_checking:
+            sub $s6 $t4 $t2
+            abs $s6 $s6
+            blt $s6 1 invalid_ship_size
+            bgt $s6 3 invalid_ship_size
+
+        overlap_checking:
+            # TO DO
+            j place_ship
+        
+        invalid_syntax:
+            la $a0 invalid_format
+            li $v0 SYS_PRINT_STRING
+            syscall
+
+            j read_ship_loop
+
+        invalid_ship_size:
+            la $a0 invalid_size
+            li $v0 SYS_PRINT_STRING
+            syscall
+
+            j read_ship_loop
+
+        diagonally_placed:
+            la $a0 invalid_placement
+            li $v0 SYS_PRINT_STRING
+            syscall
+
+            j read_ship_loop
+
+        #==== END VALIDATING INPUT ====#
+
+
+        #===== PLACING SHIP =====#
+        place_ship:
+            la $a0 confirmed_ship
+            li $v0 SYS_PRINT_STRING
+            syscall
+
+            li $t1 1
+            lb $t2 ship_coordinates($t1)
+
+            li $t1 3
+            lb $t2 ship_coordinates($t1)
+
+            li $t1 5
+            lb $t2 ship_coordinates($t1)
+            
+
+        #==== END PLACING SHIP ====#
+
+        addi $t0 $t0 -1
+        j read_ship_loop
+
+    read_ship_loop_end:
 
     jr $ra
     # endregion
@@ -300,8 +459,8 @@ print_maps:
     li $v0 SYS_PRINT_STRING
     syscall
 
-    add $t2 $s1 $0
-    add $t3 $s2 $0
+    add $t2 $s4 $0
+    add $t3 $s5 $0
     li $t0 0
 
     print_map:

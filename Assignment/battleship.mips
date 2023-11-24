@@ -123,16 +123,25 @@ hit:         .asciiz " O.O HIT! O.O \n"
 .text
 main:
     lw $s0 grid_size
-    li $s1 1
-    li $s2 2
-    li $s3 3
     la $s4 player_a_map
     la $s5 player_b_map
 
     jal game_menu
     jal rules_screen
     jal print_maps
+
+    li $s1 1
+    li $s2 2
+    li $s3 3
     la $a0 player_a_place_turn
+    li $v0 SYS_PRINT_STRING
+    syscall
+    jal read_ship
+
+    li $s1 1
+    li $s2 2
+    li $s3 3
+    la $a0 player_b_place_turn
     li $v0 SYS_PRINT_STRING
     syscall
     jal read_ship
@@ -430,12 +439,11 @@ read_ship:
 
             li $t1 1
             lb $t2 ship_coordinates($t1)
-
             li $t1 3
             lb $t2 ship_coordinates($t1)
-
             li $t1 5
             lb $t2 ship_coordinates($t1)
+            # TO DO
             
 
         #==== END PLACING SHIP ====#

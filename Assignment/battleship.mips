@@ -411,7 +411,7 @@ read_ship:
 
         overlap_checking:
             # TO DO
-            j place_ship
+            j place_ships
         
         invalid_syntax:
             la $a0 invalid_format
@@ -438,31 +438,37 @@ read_ship:
 
 
         #===== PLACING SHIP =====#
+    place_ships:
         beq $s6 player_b_turn place_ship_b
         place_ship_a:
             la $a0 confirmed_ship
             li $v0 SYS_PRINT_STRING
             syscall
 
-            li $t1 1
+            li $t1 0
             lb $t2 ship_coordinates($t1)
-            li $t1 3
-            lb $t2 ship_coordinates($t1)
-            li $t1 5
-            lb $t2 ship_coordinates($t1)
-            # TO DO
+            li $t1 2
+            lb $t3 ship_coordinates($t1)
+            li $t1 4
+            lb $t4 ship_coordinates($t1)
+            li $t1 6
+            lb $t5 ship_coordinates($t1)
+            # TO DO 
+
 
         place_ship_b:
             la $a0 confirmed_ship
             li $v0 SYS_PRINT_STRING
             syscall
 
-            li $t1 1
+            li $t1 0
             lb $t2 ship_coordinates($t1)
-            li $t1 3
-            lb $t2 ship_coordinates($t1)
-            li $t1 5
-            lb $t2 ship_coordinates($t1)
+            li $t1 2
+            lb $t3 ship_coordinates($t1)
+            li $t1 4
+            lb $t4 ship_coordinates($t1)
+            li $t1 6
+            lb $t5 ship_coordinates($t1)
             
 
         #==== END PLACING SHIP ====#

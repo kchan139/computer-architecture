@@ -152,6 +152,8 @@ main:
     jal read_ship
     jal print_maps
 
+    
+
 exit:
     li $v0 SYS_EXIT
     syscall
@@ -398,16 +400,48 @@ read_ship:
         horizontal_size_checking:   
             sub $s6 $t5 $t3
             abs $s6 $s6
-            blt $s6 1 invalid_ship_size
-            bgt $s6 3 invalid_ship_size
+            addi $s6 $s6 1
+            blt $s6 2 invalid_ship_size
+            bgt $s6 4 invalid_ship_size
 
-            j overlap_checking
+            beq $s6 2 horizontal_sub_size_2
+            beq $s6 3 horizontal_sub_size_3
+            beq $s6 4 horizontal_sub_size_4
+
+            horizontal_sub_size_2:
+                beq $s3 $0 invalid_ship_size
+                j overlap_checking
+            
+            horizontal_sub_size_3:
+                beq $s2 $0 invalid_ship_size
+                j overlap_checking
+            
+            horizontal_sub_size_4:
+                beq $s1 $0 invalid_ship_size
+                j overlap_checking
 
         vertical_size_checking:
             sub $s6 $t4 $t2
             abs $s6 $s6
-            blt $s6 1 invalid_ship_size
-            bgt $s6 3 invalid_ship_size
+            addi $s6 $s6 1
+            blt $s6 2 invalid_ship_size
+            bgt $s6 4 invalid_ship_size
+
+            beq $s6 2 vertical_sub_size_2
+            beq $s6 3 vertical_sub_size_3
+            beq $s6 4 vertical_sub_size_4
+
+            vertical_sub_size_2:
+                beq $s3 $0 invalid_ship_size
+                j overlap_checking
+            
+            vertical_sub_size_3:
+                beq $s2 $0 invalid_ship_size
+                j overlap_checking
+            
+            vertical_sub_size_4:
+                beq $s1 $0 invalid_ship_size
+                j overlap_checking
 
         overlap_checking:
             # TO DO
@@ -439,42 +473,130 @@ read_ship:
 
         #===== PLACING SHIP =====#
     place_ships:
-        beq $s6 player_b_turn place_ship_b
-        place_ship_a:
-            la $a0 confirmed_ship
-            li $v0 SYS_PRINT_STRING
-            syscall
+        la $a0 confirmed_ship
+        li $v0 SYS_PRINT_STRING
+        syscall
 
-            li $t1 0
-            lb $t2 ship_coordinates($t1)
-            li $t1 2
-            lb $t3 ship_coordinates($t1)
-            li $t1 4
-            lb $t4 ship_coordinates($t1)
-            li $t1 6
-            lb $t5 ship_coordinates($t1)
-            # TO DO 
+        li $t1 0
+        lb $t2 ship_coordinates($t1)
+        li $t1 2
+        lb $t3 ship_coordinates($t1)
+        li $t1 4
+        lb $t4 ship_coordinates($t1)
+        li $t1 6
+        lb $t5 ship_coordinates($t1)
 
+        addi $t2 $t2 -48
+        addi $t3 $t3 -48
+        addi $t4 $t4 -48
+        addi $t5 $t5 -48
 
-        place_ship_b:
-            la $a0 confirmed_ship
-            li $v0 SYS_PRINT_STRING
-            syscall
+        beq $s6 2 place_ships_sub_size_2
+        beq $s6 3 place_ships_sub_size_3
+        beq $s6 4 place_ships_sub_size_4
 
-            li $t1 0
-            lb $t2 ship_coordinates($t1)
-            li $t1 2
-            lb $t3 ship_coordinates($t1)
-            li $t1 4
-            lb $t4 ship_coordinates($t1)
-            li $t1 6
-            lb $t5 ship_coordinates($t1)
+        place_ships_sub_size_2:
+            addi $s3 $s3 -1
+            j place_ships_continue
+        
+        place_ships_sub_size_3:
+            addi $s2 $s2 -1
+            j place_ships_continue
+        
+        place_ships_sub_size_4:
+            addi $s1 $s1 -1
+            j place_ships_continue
+
+        place_ships_continue:
+        beq $s7 player_b_turn draw_ship_a_end
+
+        beq $t2 $t4 draw_horiz_a
+        beq $t3 $t5 draw_vert_a
+
+        draw_vert_a:
+            blt $t2 $t4 draw_vert_a_continue
+            # swap if t2 > t4
+            xor $t2 $t2 $t4
+            xor $t4 $t4 $t2
+            xor $t2 $t2 $t4
+
+            draw_vert_a_continue:
+                mul $t6 $t2 7
+                add $t6 $t6 $t3
+
+            draw_vert_a_loop:
+                sb $s6 player_a_map($t6)
+                beq $t2 $t4 place_ships_end
+                addi $t2 $t2 1
+                addi $t6 $t6 7
+
+                j draw_vert_a_loop
+
+        draw_horiz_a:
+            blt $t3 $t5 draw_horiz_a_continue
+            # swap if t3 > t5
+            xor $t3 $t3 $t5
+            xor $t5 $t5 $t3
+            xor $t3 $t3 $t5
+
+            draw_horiz_a_continue:
+                mul $t6 $t3 7
+                add $t6 $t6 $t2
+
+            draw_horiz_a_loop:
+                sb $s6 player_a_map($t6)
+                beq $t3 $t5 place_ships_end
+                addi $t3 $t3 1
+                addi $t6 $t6 1
+
+                j draw_horiz_a_loop
+        
+        draw_ship_a_end:
+            beq $t2 $t4 draw_horiz_b
+            beq $t3 $t5 draw_vert_b
+
+        draw_vert_b:
+            blt $t2 $t4 draw_vert_b_continue
+            # swap if t2 > t4
+            xor $t2 $t2 $t4
+            xor $t4 $t4 $t2
+            xor $t2 $t2 $t4
+
+            draw_vert_b_continue:
+                mul $t6 $t2 7
+                add $t6 $t6 $t3
+
+            draw_vert_b_loop:
+                sb $s6 player_b_map($t6)
+                beq $t2 $t4 place_ships_end
+                addi $t2 $t2 1
+                addi $t6 $t6 7
+
+                j draw_vert_b_loop
+
+        draw_horiz_b:
+            blt $t3 $t5 draw_horiz_b_continue
+            # swap if t3 > t5
+            xor $t3 $t3 $t5
+            xor $t5 $t5 $t3
+            xor $t3 $t3 $t5
+
+            draw_horiz_b_continue:
+                mul $t6 $t3 7
+                add $t6 $t6 $t2
+
+            draw_horiz_b_loop:
+                sb $s6 player_b_map($t6)
+                beq $t3 $t5 place_ships_end
+                addi $t3 $t3 1
+                addi $t6 $t6 1
+
+                j draw_horiz_b_loop
             
-
         #==== END PLACING SHIP ====#
-
-        addi $t0 $t0 -1
-        j read_ship_loop
+        place_ships_end:
+            addi $t0 $t0 -1
+            j read_ship_loop
 
     read_ship_loop_end:
 

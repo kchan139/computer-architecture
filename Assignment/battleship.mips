@@ -445,6 +445,109 @@ read_ship:
 
         overlap_checking:
             # TO DO
+            li $t1 0
+            lb $t2 ship_coordinates($t1)
+            li $t1 2
+            lb $t3 ship_coordinates($t1)
+            li $t1 4
+            lb $t4 ship_coordinates($t1)
+            li $t1 6
+            lb $t5 ship_coordinates($t1)
+
+            addi $t2 $t2 -48
+            addi $t3 $t3 -48
+            addi $t4 $t4 -48
+            addi $t5 $t5 -48
+
+            beq $s7 player_b_turn b_check
+            beq $t2 $t4 horiz_a_check
+            beq $t3 $t5 vert_a_check
+
+            vert_a_check:
+                blt $t2 $t4 vert_a_check_continue
+                # swap if t2 > t4
+                xor $t2 $t2 $t4
+                xor $t4 $t4 $t2
+                xor $t2 $t2 $t4
+
+            vert_a_check_continue:
+                mul $t6 $t2 7
+                add $t6 $t6 $t3
+
+            vert_a_check_loop:
+                lb $t7 player_a_map($t6)
+                bne $t7 $0 overlapped_error
+                beq $t2 $t4 overlap_checking_end
+                addi $t2 $t2 1
+                addi $t6 $t6 7
+
+                j vert_a_check_loop
+
+            horiz_a_check:
+                blt $t3 $t5 horiz_a_check_continue
+                # swap if t3 > t5
+                xor $t3 $t3 $t5
+                xor $t5 $t5 $t3
+                xor $t3 $t3 $t5
+
+                horiz_a_check_continue:
+                    mul $t6 $t3 7
+                    add $t6 $t6 $t2
+
+                horiz_a_check_loop:
+                    lb $t7 player_a_map($t6)
+                    bne $t7 $0 overlapped_error
+                    beq $t3 $t5 overlap_checking_end
+                    addi $t3 $t3 1
+                    addi $t6 $t6 1
+
+                    j horiz_a_check_loop
+            
+            b_check:
+                beq $t2 $t4 horiz_b_check
+                beq $t3 $t5 vert_b_check
+
+            vert_b_check:
+                blt $t2 $t4 vert_b_check_continue
+                # swap if t2 > t4
+                xor $t2 $t2 $t4
+                xor $t4 $t4 $t2
+                xor $t2 $t2 $t4
+
+            vert_b_check_continue:
+                mul $t6 $t2 7
+                add $t6 $t6 $t3
+
+            vert_b_check_loop:
+                lb $t7 player_b_map($t6)
+                bne $t7 $0 overlapped_error
+                beq $t2 $t4 overlap_checking_end
+                addi $t2 $t2 1
+                addi $t6 $t6 7
+
+                j vert_b_check_loop
+
+            horiz_b_check:
+                blt $t3 $t5 horiz_b_check_continue
+                # swap if t3 > t5
+                xor $t3 $t3 $t5
+                xor $t5 $t5 $t3
+                xor $t3 $t3 $t5
+
+                horiz_b_check_continue:
+                    mul $t6 $t3 7
+                    add $t6 $t6 $t2
+
+                horiz_b_check_loop:
+                    lb $t7 player_a_map($t6)
+                    bne $t7 $0 overlapped_error
+                    beq $t3 $t5 overlap_checking_end
+                    addi $t3 $t3 1
+                    addi $t6 $t6 1
+
+                    j horiz_b_check_loop
+        
+        overlap_checking_end:
             j place_ships
         
         invalid_syntax:
@@ -463,6 +566,13 @@ read_ship:
 
         diagonally_placed:
             la $a0 invalid_placement
+            li $v0 SYS_PRINT_STRING
+            syscall
+
+            j read_ship_loop
+
+        overlapped_error:
+            la $a0 invalid_location
             li $v0 SYS_PRINT_STRING
             syscall
 

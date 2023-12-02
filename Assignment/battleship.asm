@@ -29,7 +29,7 @@
 .eqv number_of_ships 6
 .eqv number_of_cells 49
 .eqv input_coordinates_length_shot 4
-.eqv input_coordinates_length_ship 9
+.eqv input_coordinates_length_ship 8
 
 player_a_map: .byte 0, 0, 0, 0, 0, 0, 0,
                     0, 0, 0, 0, 0, 0, 0,
@@ -122,7 +122,7 @@ invalid_location:  .asciiz "\nShips cannot overlap. Try again.\n"
 invalid_placement: .asciiz "\nShips cannot be placed diagonally. Try again.\n"
 invalid_shot:      .asciiz "\nInvalid shot coordinates. Try again.\n"
 
-confirmed_ship:    .asciiz "Ship position confirmed.\n"
+confirmed_ship:    .asciiz "\nShip position confirmed.\n"
 
 hit:         .asciiz "\n O_O HIT! O_O \n"
 miss:        .asciiz "\n T.T MISS! T.T \n"
@@ -141,27 +141,28 @@ main:
     jal rules_screen
     jal print_maps
 
-    # li $s1 1
-    # li $s2 2
-    # li $s3 3
-    # la $a0 player_a_place_turn
-    # li $v0 SYS_PRINT_STRING
-    # syscall
-    # jal read_ship
-    # jal print_maps
+    li $s1 1
+    li $s2 2
+    li $s3 3
+    la $a0 player_a_place_turn
+    li $v0 SYS_PRINT_STRING
+    syscall
+    jal read_ship
+    jal print_maps
 
-    # li $s7 player_b_turn
-    # li $s1 1
-    # li $s2 2
-    # li $s3 3
-    # la $a0 player_b_place_turn
-    # li $v0 SYS_PRINT_STRING
-    # syscall
-    # jal read_ship
-    # jal print_maps
+    li $s7 player_b_turn
+    li $s1 1
+    li $s2 2
+    li $s3 3
+    la $a0 player_b_place_turn
+    li $v0 SYS_PRINT_STRING
+    syscall
+    jal read_ship
+    jal print_maps
 
-    # li $s7 player_a_turn
+    li $s7 player_a_turn
     jal read_shot
+    jal print_maps
 
 exit:
     li $v0 SYS_EXIT
@@ -355,9 +356,11 @@ read_ship:
     li $v0 SYS_PRINT_STRING
     syscall
 
-    li $t0 number_of_ships
+    li $t0 1
     read_ship_loop:
-        beq $t0 $zero read_ship_loop_end
+        or $t0 $s1 $s2
+        or $t0 $t0 $s3
+        beq $t0 $0 read_ship_loop_end
 
         la $a0 ship_coordinates
         li $a1 input_coordinates_length_ship
@@ -819,6 +822,7 @@ read_shot:
             syscall
 
             # UPDATE PLAYER B'S MAP
+            sb $0 player_b_map($t4)
             j endgame_status_checking
 
         a_missed:
@@ -844,6 +848,7 @@ read_shot:
             syscall
 
             # UPDATE PLAYER A'S MAP
+            sb $0 player_a_map($t4)
             j endgame_status_checking
 
         b_missed:
@@ -884,8 +889,8 @@ read_shot:
                 j read_shot_loop
 
         endgame_status_checking_end:
-            beq $s7 player_a_turn player_a_wins
-            beq $s7 player_b_turn player_b_wins
+            beq $s7 player_b_turn player_a_wins
+            beq $s7 player_a_turn player_b_wins
             
         #==== END STATUS CHECKING ====#
 
@@ -894,14 +899,17 @@ read_shot:
             li $v0 SYS_PRINT_STRING
             syscall
 
-            j exit
+            j read_shot_end
 
         player_b_wins:
             la $a0 b_wins
             li $v0 SYS_PRINT_STRING
             syscall
-    
-    jr $ra
+
+            j read_shot_end
+
+    read_shot_end:
+        jr $ra
 
 print_maps:
     la $a0 grid_bar

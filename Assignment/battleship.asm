@@ -24,28 +24,32 @@
 .eqv char_y     121
 .eqv char_space 32
 
-.eqv number_of_ships 6
-.eqv input_coordinates_length 9
 .eqv player_a_turn 0
 .eqv player_b_turn 1
+.eqv number_of_ships 6
+.eqv number_of_cells 49
+.eqv input_coordinates_length_shot 4
+.eqv input_coordinates_length_ship 9
 
-player_a_map:     .byte 0, 0, 0, 0, 0, 0, 0,
-                        0, 0, 0, 0, 0, 0, 0,
-                        0, 0, 0, 0, 0, 0, 0,
-                        0, 0, 0, 0, 0, 0, 0,
-                        0, 0, 0, 0, 0, 0, 0,
-                        0, 0, 0, 0, 0, 0, 0,
-                        0, 0, 0, 0, 0, 0, 0
+player_a_map: .byte 0, 0, 0, 0, 0, 0, 0,
+                    0, 0, 0, 0, 0, 0, 0,
+                    0, 0, 0, 0, 0, 0, 0,
+                    0, 0, 0, 0, 0, 0, 0,
+                    0, 0, 0, 0, 0, 0, 0,
+                    0, 0, 0, 0, 0, 0, 0,
+                    0, 0, 0, 0, 0, 0, 0
 
-player_b_map:     .byte 0, 0, 0, 0, 0, 0, 0,
-                        0, 0, 0, 0, 0, 0, 0,
-                        0, 0, 0, 0, 0, 0, 0,
-                        0, 0, 0, 0, 0, 0, 0,
-                        0, 0, 0, 0, 0, 0, 0,
-                        0, 0, 0, 0, 0, 0, 0,
-                        0, 0, 0, 0, 0, 0, 0
+player_b_map: .byte 0, 0, 0, 0, 0, 0, 0,
+                    0, 0, 0, 0, 0, 0, 0,
+                    0, 0, 0, 0, 0, 0, 0,
+                    0, 0, 0, 0, 0, 0, 0,
+                    0, 0, 0, 0, 0, 0, 0,
+                    0, 0, 0, 0, 0, 0, 0,
+                    0, 0, 0, 0, 0, 0, 0
+
 grid_size:        .word  7
 ship_coordinates: .space 8
+shot_coordinates: .space 5
 
 title_0:  .asciiz "===============================================================================================================\n"
 title_1:  .asciiz "||    ______        _     _________  _________  _____     ________   ______   ____  ____  _____  _______     ||\n"
@@ -110,17 +114,21 @@ player_a_place_turn: .asciiz "\n!!! PLAYER A TURN !!!\n"
 player_b_place_turn: .asciiz "\n!!! PLAYER B TURN !!!\n"
 
 prompt_ship: .asciiz "\n! ENTER SHIPS LOCATIONS !~\nInput format: [r_bow  c_bow  r_stern  c_stern]\n[Q]: Quit to main menu\n[R]: Restart\n"
-prompt_shot: .asciiz "Enter shot location (r c): "
+prompt_shot: .asciiz "Enter shot location\nInput format: [r  c]\n[Q]: Quit to main menu\n[R]: Restart\n"
 
 invalid_format:    .asciiz "\nInvalid coordinates format. Try again.\n"
 invalid_size:      .asciiz "\nInvalid ship size. Try again.\n"
 invalid_location:  .asciiz "\nShips cannot overlap. Try again.\n"
 invalid_placement: .asciiz "\nShips cannot be placed diagonally. Try again.\n"
-invalid_shot:      .asciiz "\nInvalid shot. Try again.\n"
+invalid_shot:      .asciiz "\nInvalid shot coordinates. Try again.\n"
 
 confirmed_ship:    .asciiz "Ship position confirmed.\n"
 
-hit:         .asciiz " O.O HIT! O.O \n"
+hit:         .asciiz "\n O_O HIT! O_O \n"
+miss:        .asciiz "\n T.T MISS! T.T \n"
+
+a_wins:      .asciiz "\n!!! PLAYER A WON THE GAME. CONGRATULATIONS !!!\n"
+b_wins:      .asciiz "\n!!! PLAYER B WON THE GAME. CONGRATULATIONS !!!\n"
 
 .text
 main:
@@ -133,26 +141,27 @@ main:
     jal rules_screen
     jal print_maps
 
-    li $s1 1
-    li $s2 2
-    li $s3 3
-    la $a0 player_a_place_turn
-    li $v0 SYS_PRINT_STRING
-    syscall
-    jal read_ship
-    jal print_maps
+    # li $s1 1
+    # li $s2 2
+    # li $s3 3
+    # la $a0 player_a_place_turn
+    # li $v0 SYS_PRINT_STRING
+    # syscall
+    # jal read_ship
+    # jal print_maps
 
-    addi $s7 $s7 player_b_turn
-    li $s1 1
-    li $s2 2
-    li $s3 3
-    la $a0 player_b_place_turn
-    li $v0 SYS_PRINT_STRING
-    syscall
-    jal read_ship
-    jal print_maps
+    # li $s7 player_b_turn
+    # li $s1 1
+    # li $s2 2
+    # li $s3 3
+    # la $a0 player_b_place_turn
+    # li $v0 SYS_PRINT_STRING
+    # syscall
+    # jal read_ship
+    # jal print_maps
 
-    
+    # li $s7 player_a_turn
+    jal read_shot
 
 exit:
     li $v0 SYS_EXIT
@@ -351,7 +360,7 @@ read_ship:
         beq $t0 $zero read_ship_loop_end
 
         la $a0 ship_coordinates
-        li $a1 input_coordinates_length
+        li $a1 input_coordinates_length_ship
         li $v0 SYS_READ_STRING
         syscall
 
@@ -539,7 +548,7 @@ read_ship:
                     add $t6 $t6 $t2
 
                 horiz_b_check_loop:
-                    lb $t7 player_a_map($t6)
+                    lb $t7 player_b_map($t6)
                     bne $t7 $0 overlapped_error
                     beq $t3 $t5 overlap_checking_end
                     addi $t3 $t3 1
@@ -579,7 +588,6 @@ read_ship:
             j read_ship_loop
 
         #==== END VALIDATING INPUT ====#
-
 
         #===== PLACING SHIP =====#
     place_ships:
@@ -650,8 +658,8 @@ read_ship:
             xor $t3 $t3 $t5
 
             draw_horiz_a_continue:
-                mul $t6 $t3 7
-                add $t6 $t6 $t2
+                mul $t6 $t2 7
+                add $t6 $t6 $t3
 
             draw_horiz_a_loop:
                 sb $s6 player_a_map($t6)
@@ -692,8 +700,8 @@ read_ship:
             xor $t3 $t3 $t5
 
             draw_horiz_b_continue:
-                mul $t6 $t3 7
-                add $t6 $t6 $t2
+                mul $t6 $t2 7
+                add $t6 $t6 $t3
 
             draw_horiz_b_loop:
                 sb $s6 player_b_map($t6)
@@ -712,6 +720,188 @@ read_ship:
 
     jr $ra
     # endregion
+
+read_shot:
+    # region[rgba(0, 255, 0, 0.2)]
+    la $a0 prompt_shot
+    li $v0 SYS_PRINT_STRING
+    syscall
+
+    read_shot_loop:
+        beq $s7 player_a_turn prompt_a_shot
+        beq $s7 player_b_turn prompt_b_shot
+
+        prompt_a_shot:
+            la $a0 player_a_place_turn
+            li $v0 SYS_PRINT_STRING
+            syscall
+            j read_shot_continue
+
+        prompt_b_shot:
+            la $a0 player_b_place_turn
+            li $v0 SYS_PRINT_STRING
+            syscall
+            j read_shot_continue
+
+        read_shot_continue:
+
+        la $a0 shot_coordinates
+        li $a1 input_coordinates_length_shot
+        li $v0 SYS_READ_STRING
+        syscall
+
+        #===== VALIDATING INPUT =====#
+        user_option_checking_shot:
+            lb $t1 shot_coordinates
+            beq $t1 char_R read_shot
+            beq $t1 char_r read_shot
+            beq $t1 char_Q main
+            beq $t1 char_q main
+
+        format_checking_shot:
+            li $t1 1
+            lb $t2 shot_coordinates($t1)
+            bne $t2 char_space invalid_syntax_shot
+
+        value_checking_shot:
+            li $t1 0
+            lb $t2 shot_coordinates($t1)
+            blt $t2 char_0 invalid_shot_coordinates
+            bgt $t2 char_6 invalid_shot_coordinates
+            li $t1 2
+            lb $t3 shot_coordinates($t1)
+            blt $t3 char_0 invalid_shot_coordinates
+            bgt $t3 char_6 invalid_shot_coordinates
+
+        j shooting
+
+        invalid_syntax_shot:
+            la $a0 invalid_format
+            li $v0 SYS_PRINT_STRING
+            syscall
+
+            j read_shot_loop
+
+        invalid_shot_coordinates:
+            la $a0 invalid_shot
+            li $v0 SYS_PRINT_STRING
+            syscall
+
+            j read_shot_loop
+
+        #==== END VALIDATING INPUT ====#
+
+        #===== SHOOTING =====#
+        shooting:
+            li $t1 0
+            lb $t2 shot_coordinates($t1)
+            li $t1 2
+            lb $t3 shot_coordinates($t1)
+
+            addi $t2 $t2 -48
+            addi $t3 $t3 -48
+
+            beq $s7 player_a_turn a_shot
+            beq $s7 player_b_turn b_shot
+
+        a_shot:
+            li $s7 player_b_turn
+            mul $t4 $t2 7
+            add $t4 $t4 $t3
+
+            lb $t5 player_b_map($t4)
+            bne $t5 $0 a_hit
+            j a_missed
+
+        a_hit:
+            la $a0 hit
+            li $v0 SYS_PRINT_STRING
+            syscall
+
+            # UPDATE PLAYER B'S MAP
+            j endgame_status_checking
+
+        a_missed:
+            la $a0 miss
+            li $v0 SYS_PRINT_STRING
+            syscall
+            
+            j read_shot_loop
+
+        # B's turn
+        b_shot:
+            li $s7 player_a_turn
+            mul $t4 $t2 7
+            add $t4 $t4 $t3
+
+            lb $t5 player_a_map($t4)
+            bne $t5 $0 b_hit
+            j b_missed
+
+        b_hit:
+            la $a0 hit
+            li $v0 SYS_PRINT_STRING
+            syscall
+
+            # UPDATE PLAYER A'S MAP
+            j endgame_status_checking
+
+        b_missed:
+            la $a0 miss
+            li $v0 SYS_PRINT_STRING
+            syscall
+            
+            j read_shot_loop
+
+        #==== END SHOOTING ====#
+
+        #===== STATUS CHECKING =====#
+        endgame_status_checking:
+            li $t0 0
+
+            beq $s7 player_a_turn a_status_loop
+            beq $s7 player_b_turn b_status_loop
+
+            a_status_loop:
+                lb $t1 player_a_map($t0)
+                bne $t1 $0 continue_the_game
+
+                addi $t0 $t0 1
+                beq $t0 number_of_cells endgame_status_checking_end
+
+                j a_status_loop
+
+            b_status_loop:
+                lb $t1 player_b_map($t0)
+                bne $t1 $0 continue_the_game
+
+                addi $t0 $t0 1
+                beq $t0 number_of_cells endgame_status_checking_end
+
+                j b_status_loop
+
+            continue_the_game:
+                j read_shot_loop
+
+        endgame_status_checking_end:
+            beq $s7 player_a_turn player_a_wins
+            beq $s7 player_b_turn player_b_wins
+            
+        #==== END STATUS CHECKING ====#
+
+        player_a_wins:
+            la $a0 a_wins
+            li $v0 SYS_PRINT_STRING
+            syscall
+
+            j exit
+
+        player_b_wins:
+            la $a0 b_wins
+            li $v0 SYS_PRINT_STRING
+            syscall
+    
+    jr $ra
 
 print_maps:
     la $a0 grid_bar

@@ -1,0 +1,44 @@
+\section{MIPS Assembly Implementation}
+\subsection{Introduction}
+\qquad In this project, we aim to emulate the Battleship game using the \textit{MIPS} assembly language. Due to resource constraints and to keep things simple, we will work with a smaller grid size which is \textbf{7$\times$7}\\
+
+\qquad A ship location is indicated by the
+coordinates of the bow and the stern of the ship (row$_{\text{bow}}$, column$_{\text{bow}}$, row$_{\text{stern}}$, column$_{\text{stern}}$).
+
+\subsection{Overall Structure}
+Describe the overall structure of the code.\\
+
+Highlight the main sections, such as data section (.data), text section (.text), and various segments like the game menu, rules screen, ship placement, and shooting.
+
+\subsection{Constants and Definitions}
+Explain the purpose of constants defined using .eqv (e.g., system calls, characters, and game-related constants).
+
+\subsection{Data Section}
+Describe the data section (.data) and the defined constants.\\
+
+Discuss the purpose of player maps, grid size, ship and shot coordinates, and the title/rules strings.
+
+\subsection{User Interface}
+Explain how the game menu is displayed to the user.\\
+
+Discuss how the rules screen is presented with ASCII art.
+
+\subsection{Game Logic}
+Analyze the game flow from the main function.\\
+
+Discuss how players take turns placing ships and shooting, including input validation.
+
+\subsection{Helper Functions}
+Describe the purpose of each function \(e.g., game_menu, rules_screen, read_ship, read_shot\).\\
+
+Highlight the functionality of key functions and their interaction.
+
+\subsection{Input Validation - Error Handling}
+Discuss how the code validates user input for ship and shot coordinates. \\
+
+Analyze the error messages and how they guide the user.
+
+\subsection{Gameplay Logic}
+Explain the sequence of events during ship placement and shooting.\\
+
+Discuss how ships are drawn on the maps and the conditions for hitting or missing.

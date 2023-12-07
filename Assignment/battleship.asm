@@ -456,7 +456,6 @@ read_ship:
                 j overlap_checking
 
         overlap_checking:
-            # TO DO
             li $t1 0
             lb $t2 ship_coordinates($t1)
             li $t1 2

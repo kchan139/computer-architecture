@@ -1,8 +1,20 @@
 \section{MIPS Assembly Implementation}
 \subsection{Introduction}
-\qquad In this project, we aim to emulate the Battleship game using the \textit{MIPS} assembly language. Due to resource constraints and to keep things simple, we will work with a smaller grid size which is \textbf{7$\times$7}
-% \qquad A ship location is indicated by the
-% coordinates of the bow and the stern of the ship (row$_{\text{bow}}$, column$_{\text{bow}}$, row$_{\text{stern}}$, column$_{\text{stern}}$).
+\qquad In this project, we aim to emulate the Battleship game using the \textit{MIPS} assembly language. Due to resource constraints and to keep things simple, we will work with a smaller grid size which is \textbf{7$\times$7} \\
+
+\qquad A ship location is indicated by the
+coordinates of the bow and the stern of the ship (row$_{\text{bow}}$, column$_{\text{bow}}$, row$_{\text{stern}}$, column$_{\text{stern}}$). 
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=10cm]{graphics/intromap.jpg}
+    \selectlanguage{english}
+    \caption{Map}
+\end{figure}
+
+In the above figure, the coordinates of the \textbf{4$\times$1} ship is \texttt{0 0 0 3}; the green \textbf{3$\times$1} ships are \texttt{5 3 5 5} and \texttt{6 0 6 2}; the \textbf{2$\times$1} ships are \texttt{1 4 2 4},   \texttt{2 1 3 1}, and \texttt{4 4 4 5}. \\
+
+\qquad The initial phase involves players arranging their ship positions. The program prompts players to input ship locations on a map where each cell holds either "the ship's size" or "0", indicating an empty/unoccupied space. Specifically, a cell contains the ship's size if occupied, and 0 if empty. During the setup phase, players must precisely position a predefined number of ships, each of the same size. In detail, each player will have 3 \textbf{2$\times$1} ships, 2 \textbf{3$\times$1} ships, and 1 \textbf{4$\times$1} ship. Note that ships can not overlap with each other.
 
 \subsection{Overall Structure}
 \begin{enumerate}
@@ -119,7 +131,30 @@ Explain the purpose of constants defined using .eqv (e.g., system calls, charact
     \end{figure}
 
     \newpage
-    \item \textbf{Initial Maps (For Grader):} \\
+
+    
+    \item \textbf{Placing Ships Interface:} \\
+    
+    \begin{figure}[H]
+        \centering
+        \includegraphics[width=10cm]{graphics/placing.jpg}
+        \selectlanguage{english}
+        \caption{Placing Ships Interface}
+    \end{figure}
+
+    \newpage
+
+    \item \textbf{Shooting and Endgame Interface:} \\
+    
+    \begin{figure}[H]
+        \centering
+        \includegraphics[width=15cm]{graphics/shooting_ending.jpg}
+        \selectlanguage{english}
+        \caption{Shooting and Endgame Interface}
+    \end{figure}
+
+    \newpage
+    \item \textbf{Player's Maps (For Grader):} \\
     
     In addition to the player-facing interface, there is a dedicated section for the grader to inspect the initial maps. These maps, represented as matrices, serve as the starting configuration for each player's game board. The matrix values denote ship placements and empty cells. This section aids the grader in evaluating the correctness of the initial game state, ensuring that the ships are appropriately positioned and adhere to the specified rules. The clarity of the ASCII art in the initial maps facilitates a quick and accurate assessment, streamlining the grading process.\\
 
@@ -131,6 +166,8 @@ Explain the purpose of constants defined using .eqv (e.g., system calls, charact
     \end{figure}
     
 \end{enumerate}
+
+\newpage
 
 \subsection{Game Logic}
 \qquad Let's break down the main functions, focusing on how players take turns placing ships and shooting, including input validation:
@@ -189,6 +226,8 @@ Explain the purpose of constants defined using .eqv (e.g., system calls, charact
     \item \textbf{Exit:} \\[6pt]
     Exiting the Game: The game can be exited at any time by choosing the option to quit (\texttt{[Q]} or \texttt{[q]}).
 \end{enumerate}
+
+\newpage
 
 \subsection{Helper Functions}
 \begin{enumerate}
@@ -261,15 +300,41 @@ Explain the purpose of constants defined using .eqv (e.g., system calls, charact
     \end{itemize}
 
     \item \large{\texttt{READ\_SHIP:}} \\[6pt]
+    \qquad The \texttt{read\_ship} function is responsible for obtaining and validating user input for placing ships on a game map. The input is expected in the format of ship coordinates, and the function performs various checks to ensure the input adheres to the game's rules.
+    \begin{itemize}
+        \item Print Prompt: The function starts by printing a prompt (\texttt{prompt\_ship}) to guide the user in entering ship coordinates.
+        \item Input Loop: The function enters a loop (\texttt{read\_ship\_loop}) to continuously read and validate ship coordinates until a valid input is provided.
+        \item Coordinate Validation:
+        \begin{itemize}
+            \item It checks for specific user options (\texttt{[R], [r], [Q], [q]}) to either proceed with ship placement or return to the game menu.
+            \item Format checking to ensure correct input structure.
+            \item Value checking to verify that coordinates are within valid ranges.
+            \item Diagonal checking to restrict diagonal ship placement.
+        \end{itemize}
+        \item Overlap Checking: The function contains a section for checking whether the entered ship coordinates overlap with existing ships on the map.
+        \item Placing Ships: Once the input passes all validation checks, the function proceeds to place the ship on the game map.
+        \item Error Handling: The function includes various error messages (\texttt{invalid\_format}, \texttt{invalid\_size}, \texttt{invalid\_placement}, \texttt{invalid\_location}) to notify the user of input errors. \\
+    \end{itemize}
+
+    \item \large{\texttt{READ\_SHOT:}} \\[6pt]
+    \qquad The \texttt{read\_shot} function handles the process of obtaining, validating, and processing user input for shooting at the opponent's game map. It ensures that the entered shot coordinates are valid and performs the corresponding actions based on the game's rules.
+
+    \begin{itemize}
+        \item Print Prompt: The function starts by printing a prompt (\texttt{prompt\_shot}) to guide the user in entering shot coordinates.
+        \item Player Turn Determination: The function determines the current player's turn based on the value of \texttt{\$s7}. It prompts the appropriate message for the player's turn (\texttt{player\_a\_place\_turn} or \texttt{player\_b\_place\_turn}).
+        \item Input Loop: The function enters a loop (\texttt{read\_shot\_loop}) to continuously read, validate, and process shot coordinates until a valid input is provided.
+        \item Coordinate Validation:
+        \begin{itemize}
+            \item It checks for specific user options (\texttt{[R], [r], [Q], [q]}) to either proceed with shooting or return to the game menu.
+            Further checks include format checking, ensuring only one space is present, and validating that coordinates are within valid ranges.
+        \end{itemize}
+        \item Shooting Logic:
+        \begin{itemize}
+            \item The function distinguishes between Player A's and Player B's turns.
+            \item It processes the shot coordinates, checks for hits or misses, updates the opponent's map accordingly, and proceeds to endgame status checking.
+        \end{itemize}
+        \item Endgame Status Checking: The function checks whether the game has ended by verifying whether all cells on the opponent's map have been hit.
+        \item Endgame Messages: It prints messages (\texttt{a\_wins} or \texttt{b\_wins}) based on the winner of the game.
+    \end{itemize}
 
 \end{enumerate}
-
-\subsection{Input Validation - Error Handling}
-Discuss how the code validates user input for ship and shot coordinates. \\
-
-Analyze the error messages and how they guide the user.
-
-\subsection{Gameplay Logic}
-Explain the sequence of events during ship placement and shooting.\\
-
-Discuss how ships are drawn on the maps and the conditions for hitting or missing.

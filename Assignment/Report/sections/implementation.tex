@@ -24,7 +24,7 @@
             \item Main Section:\\
             The main section initializes registers, loads addresses for player maps, and orchestrates the initial setup of the game. It sets the stage for the subsequent execution of the game logic.
             \item Function Calls:\\
-            Function calls to \texttt{game\_menu}, \textbf{rules\_screen}, and \texttt{print\_maps} contribute to the modular design of the code. These functions encapsulate specific functionalities, promoting code readability and maintainability.
+            Function calls to \texttt{game\_menu}, \texttt{rules\_screen}, and \texttt{print\_maps} contribute to the modular design of the code. These functions encapsulate specific functionalities, promoting code readability and maintainability.
             \item Game Setup:\\
             The code calls the \texttt{read\_ship} function twice, allowing players to input ship positions for player A and player B. After all the ships have been placed, the \texttt{print\_maps} function is invoked to visualize the current game state.
             \item Game Loop:\\
@@ -36,7 +36,6 @@
     \item \textbf{Helper Functions} \\
     This subsection delves into the specifics of key functions such as \texttt{read\_ship} and \texttt{read\_shot}. These functions are responsible for \textit{acquiring} user input, \textit{validating} it, and \textit{facilitating the corresponding game actions}.
 \end{enumerate}
-
 
 \subsection{Constants and Definitions}
 Explain the purpose of constants defined using .eqv (e.g., system calls, characters, and game-related constants).
@@ -88,9 +87,10 @@ Explain the purpose of constants defined using .eqv (e.g., system calls, charact
     \end{itemize}
 \end{enumerate}
 
-These directives and data declarations provide symbolic names for system calls, characters, game constants, and storage spaces, making the MIPS assembly code more readable and maintainable. The constants and data structures defined here are used throughout the program to enhance code clarity and facilitate updates.\\
+\qquad These directives and data declarations provide symbolic names for system calls, characters, game constants, and storage spaces, making the MIPS assembly code more readable and maintainable. The constants and data structures defined here are used throughout the program to enhance code clarity and facilitate updates.\\
 
 \newpage
+
 \subsection{User Interface}
 \begin{enumerate}
     \item \textbf{Game Menu:} \\
@@ -133,14 +133,136 @@ These directives and data declarations provide symbolic names for system calls, 
 \end{enumerate}
 
 \subsection{Game Logic}
-Analyze the game flow from the main function.\\
+\qquad Let's break down the main functions, focusing on how players take turns placing ships and shooting, including input validation:
 
-Discuss how players take turns placing ships and shooting, including input validation.
+\begin{enumerate}
+    \item \textbf{Initialization:} \\[6pt]
+    \texttt{\$s0}: Grid Size. \\
+    \texttt{\$s1}: \textbf{4$\times$1} ships quantity (value: 1). \\
+    \texttt{\$s2}: \textbf{3$\times$1} ships quantity (value: 2). \\
+    \texttt{\$s3}: \textbf{2$\times$1} ships quantity (value: 3). \\
+    \texttt{\$s4}: Player A's map. \\
+    \texttt{\$s5}: Player B's map. \\
+    \texttt{\$s7}: Player A's turn. \\
+
+    Calls \texttt{game\_menu},  \texttt{rules\_screen}, and  \texttt{print\_maps} to display the menu, rules, and initial maps.
+
+    \item \textbf{Player A Places Ships:} \\[6pt]
+    Read Ship Coordinates for Player A:
+    \begin{itemize}
+        \item Calls \texttt{read\_ship} function with the label \texttt{player\_a\_place\_turn}.
+        \item Validates ship placement input using a series of checks (format, size, overlap, etc.).
+    \end{itemize}
+
+    \item \textbf{Player B Places Ships:} \\[6pt]
+    Read Ship Coordinates for Player B:
+    \begin{itemize}
+        \item Calls \texttt{read\_ship} function with the label 
+        \texttt{player\_b\_place\_turn}.
+        \item Similar to Player A, validates ship placement input.
+    \end{itemize}
+
+    \item \textbf{Player A Takes a Shot:} \\[6pt]
+    Read Shot Coordinates for Player A:
+    \begin{itemize}
+        \item Calls \texttt{read\_shot} function and displays Player A's label (\texttt{player\_a\_place\_turn}).
+        \item Validates shot input using similar checks as ship placement.
+    \end{itemize}
+
+    \item \textbf{Player B Takes a Shot:} \\[6pt]
+    Read Shot Coordinates for Player B:
+    \begin{itemize}
+        \item Calls \texttt{read\_shot} function and displays Player B's label (\texttt{player\_b\_place\_turn}).
+        \item Validates shot input.
+    \end{itemize}
+
+    \item \textbf{Endgame Status Checking:} \\[6pt]
+    Check for Win/Loss:
+    \begin{itemize}
+        \item After each shot, the game checks the status to determine if one of the players has won.
+        \item Calls \texttt{endgame\_status\_checking} to check if all ships of the opponent have been hit.
+    \end{itemize}
+
+    \item \textbf{Printing Maps:} \\[6pt]
+    Print Current State: Calls \texttt{print\_maps} to display the updated maps after ship placements and shots.
+
+    \item \textbf{Exit:} \\[6pt]
+    Exiting the Game: The game can be exited at any time by choosing the option to quit (\texttt{[Q]} or \texttt{[q]}).
+\end{enumerate}
 
 \subsection{Helper Functions}
-Describe the purpose of each function \(e.g., game_menu, rules_screen, read_ship, read_shot\).\\
+\begin{enumerate}
+    \item \large{\texttt{GAME\_MENU:}}
+    
+    \qquad The \texttt{game\_menu} function serve the purpose of displaying a menu for the game and allowing the player to start or exit the game based on their input. Let's break down the key components:
+    \begin{itemize}
+        \item Display Menu Titles:
+        \begin{itemize}
+            \item The function uses a series of \texttt{la} (\textit{load address}) instructions to load strings (\texttt{title\_0} to \texttt{title\_12}) representing different lines of the menu title.
+            \item It prints these titles to the console using the \texttt{SYS\_PRINT\_STRING} system call.
+        \end{itemize}
+        \item Display Start Prompt: \\
+        It prints the string stored at the address \texttt{start} to prompt the player to start the game.
+        \item User Input:
+        \begin{itemize}
+            \item It enters a loop (\texttt{start\_loop}) that prompts the user to input a character.
+            \item The input character is stored in \texttt{\$t0}, and an additional read is performed to consume the \texttt{newline ($\backslash$n)} character.
+        \end{itemize}
+        \item Processing User Input: \\[6pt]
+        It checks the input character and proceeds accordingly:
+        \begin{itemize}
+            \item If the character is \texttt{'y'} or \texttt{'Y'}, it jumps to the label \texttt{game\_menu\_proceed}, suggesting that the player wants to \textit{proceed} with the game.
+            \item If the character is \texttt{'n'} or \texttt{'N'}, it jumps to the label \texttt{exit}, indicating that the player wants to \textit{exit} the game.
+            \item If the input is anything else, it \textit{continues} the loop (\texttt{start\_loop}) to get a valid input.
+        \end{itemize}
+        \item End of the Function: \\[6pt]
+        The function ends by jumping to the \texttt{jr \$ra} instruction, which returns control to the calling function (\texttt{main}).\\
+    \end{itemize}
 
-Highlight the functionality of key functions and their interaction.
+    \item \large{\texttt{RULES\_SCREEN:}}
+    
+    \qquad The \texttt{rules\_screen} function serve the purpose of displaying a set of rules to the player and allowing them to choose whether to proceed or return to the game menu based on their input. Let's break down the key components:
+
+    \begin{itemize}
+        \item Display Rules:
+        \begin{itemize}
+            \item The function loads a series of strings (\texttt{rule\_0} to \texttt{rule\_24}) representing different lines of the rules.
+            \item It prints these rules to the console using the \texttt{SYS\_PRINT\_STRING} system call.
+        \end{itemize}
+        \item Display Proceed Prompt: \\[6pt]
+        It prints the string stored at the address \texttt{proceed} to prompt the player to either \textit{proceed} or \textit{return} to the game menu.
+        \item User Input:
+        \begin{itemize}
+            \item It enters a loop (\texttt{proceed\_loop}) that prompts the user to input a character.
+            \item The input character is stored in \textit{\$t0}, and an additional read is performed to consume the \texttt{newline ($\backslash$n)} character.
+        \end{itemize}
+        \item Processing User Input: \\[6pt]
+        It checks the input character and proceeds accordingly:
+        \begin{itemize}
+            \item If the character is \texttt{'y'} or \texttt{'Y'}, it jumps to the label \texttt{rules\_screen\_proceed}, suggesting that the player wants to \textit{proceed} with the game.
+            \item If the character is \texttt{'n'} or \texttt{'N'}, it jumps to the label \texttt{main}, indicating that the player wants to \textit{return} to the game menu.
+            \item If the input is anything else, it \textit{continues} the loop (\texttt{proceed\_loop}) to get a valid input.
+        \end{itemize}
+        \item End of the Function: \\[6pt]
+        The function ends by jumping to the \texttt{jr \$ra} instruction, which returns control to the calling function (\texttt{main}). \\
+    \end{itemize}
+
+    \item \large{\texttt{PRINT\_MAPS:}} \\[6pt]
+    The \texttt{print\_maps} function have the purpose of printing a game map to the console. It is a textual representation of a grid-based map. Let's break down the key components:
+
+    \begin{itemize}
+        \item Print Header: The function starts by printing a header that includes visual separators (\texttt{grid\_bar}) and a label for the player (\texttt{player\_label}).
+        \item Initialization: It initializes variables (\texttt{\$t2}, \texttt{\$t3}, and \texttt{\$t0}) that is to be related to map dimensions and loop control.
+        \item Print Map Rows: The core functionality involves a loop (\texttt{print\_map}) for printing each row of the map.
+        \item Print Grid Elements: Within the row printing loop, the function prints various elements, including grid helpers (\texttt{grid\_helper}), actual values from the map, and visual separators (\texttt{grid\_vert}).
+        \item Print Row Transitions: Transitions between different parts of the row are marked with the \texttt{grid\_trans} string.
+        \item Loop Control and Row End: The function carefully manages loop control variables (\texttt{\$t1}, \texttt{\$t4}) to control the number of rows printed. It ensures proper termination with the \texttt{print\_row\_loop\_end} label.
+        \item Print Footer: A footer is added with \texttt{newline} characters and another visual separator (\texttt{grid\_bar}). \\
+    \end{itemize}
+
+    \item \large{\texttt{READ\_SHIP:}} \\[6pt]
+
+\end{enumerate}
 
 \subsection{Input Validation - Error Handling}
 Discuss how the code validates user input for ship and shot coordinates. \\

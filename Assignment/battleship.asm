@@ -502,8 +502,8 @@ read_ship:
                 xor $t3 $t3 $t5
 
                 horiz_a_check_continue:
-                    mul $t6 $t3 7
-                    add $t6 $t6 $t2
+                    mul $t6 $t2 7
+                    add $t6 $t6 $t3
 
                 horiz_a_check_loop:
                     lb $t7 player_a_map($t6)
@@ -546,8 +546,8 @@ read_ship:
                 xor $t3 $t3 $t5
 
                 horiz_b_check_continue:
-                    mul $t6 $t3 7
-                    add $t6 $t6 $t2
+                    mul $t6 $t2 7
+                    add $t6 $t6 $t3
 
                 horiz_b_check_loop:
                     lb $t7 player_b_map($t6)
